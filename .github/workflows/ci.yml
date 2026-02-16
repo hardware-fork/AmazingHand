@@ -1,0 +1,22 @@
+name: CI
+
+on:
+  push: {}
+  pull_request: {}
+  workflow_dispatch:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: prefix-dev/setup-pixi@v0.9.4
+        with:
+          cache: ${{ !env.ACT }}
+
+      - name: Run pre-commit
+        run: pixi run pre-commit run --all-files
+
+      - name: Unit tests
+        run: pixi run test

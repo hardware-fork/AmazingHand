@@ -1,0 +1,81 @@
+# Per-team serial settings. Set AMAZINGHAND_TEAM=julia or AMAZINGHAND_TEAM=krishan to choose.
+# Leave port empty to use OS default (COM3 on Windows, /dev/ttyUSB0 on Linux).
+# Finger config: each finger has servo_ids (2) and middle_pos (2). hand_1 = right, hand_2 = left.
+# Demo uses one hand (side 1 = hand_1, side 2 = hand_2). Demo_Both uses both.
+# Side: 1 = right hand, 2 = left hand. Speed: max_speed (open), close_speed (close).
+
+# Finger test: two servos for calibration / FingerTest / Hand_FingerMiddlePos scripts.
+# finger_test_servo_ids = [id1, id2], finger_test_middle_pos = [deg1, deg2].
+# Hand demo: hand_test_id = 1 or 2 selects which hand to use (overrides side when set).
+
+[team_julia]
+port = "/dev/ttyACM0"
+baudrate = 1000000
+timeout = 0.5
+side = 1
+max_speed = 7
+close_speed = 3
+
+# testing finger calibration
+finger_test_servo_ids = [6, 5]
+finger_test_middle_pos = [-3, 8]
+
+# hand demo testing: hand_test_id selects which hand (overrides side when set).
+# hand_test_id 1 => hand_1 (right), hand_test_id 2 => hand_2 (left).
+hand_test_id = 1
+
+# hand_1 (right)
+hand_1_index_servo_ids = [1, 2]
+hand_1_index_middle_pos = [-2, 0]
+hand_1_middle_servo_ids = [3, 4]
+hand_1_middle_middle_pos = [1,2]
+hand_1_ring_servo_ids = [6,5]
+hand_1_ring_middle_pos = [-3,8]
+hand_1_thumb_servo_ids = [8,7]
+hand_1_thumb_middle_pos = [8,-8]
+
+# hand_2 (left) – required for Demo (side=2) and Demo_Both
+hand_2_index_servo_ids = [0, 0]
+hand_2_index_middle_pos = [0, 0]
+hand_2_middle_servo_ids = [0, 0]
+hand_2_middle_middle_pos = [2, 5]
+hand_2_ring_servo_ids = [0, 0]
+hand_2_ring_middle_pos = [-2, -8]
+hand_2_thumb_servo_ids = [0, 0]
+hand_2_thumb_middle_pos = [0, -15]
+
+[team_krishan]
+port = "COM3"
+baudrate = 1000000
+timeout = 2.5
+side = 2
+max_speed = 7
+close_speed = 3
+
+# testing finger calibration
+finger_test_servo_ids = [13, 14]
+finger_test_middle_pos = [5, -2]
+
+# hand demo testing: hand_test_id selects which hand (overrides side when set).
+# hand_test_id 1 => hand_1 (right), hand_test_id 2 => hand_2 (left).
+hand_test_id = 2
+
+# hand_1 (right)
+hand_1_index_servo_ids = [1, 2]
+hand_1_index_middle_pos = [3, 0]
+hand_1_middle_servo_ids = [3, 4]
+hand_1_middle_middle_pos = [-8, -13]
+hand_1_ring_servo_ids = [5, 6]
+hand_1_ring_middle_pos = [2, -5]
+hand_1_thumb_servo_ids = [7, 8]
+hand_1_thumb_middle_pos = [-12, -5]
+
+# hand_2 (left) – required for Demo (side=2) and Demo_Both
+hand_2_index_servo_ids = [11, 12]
+hand_2_index_middle_pos = [3, -3]
+hand_2_middle_servo_ids = [13, 14]
+hand_2_middle_middle_pos = [-1, -10]
+hand_2_ring_servo_ids = [15, 16]
+hand_2_ring_middle_pos = [5, 2]
+hand_2_thumb_servo_ids = [17, 18]
+hand_2_thumb_middle_pos = [-7, 3]

@@ -36,7 +36,7 @@ Amazing Hand is:
 [AmazingHand_Overview](/docs/AmazingHand_Overview.pdf)
 
 ![Hand Overview](assets/Hand_Overview.jpg)
-Each finger is driven by a parallel mechanism. 
+Each finger is driven by a parallel mechanism.
 That means 2x small Feetech SCS0009 servos are used to move each finger in flexion/extension and abduction/adduction
 
 ![Finger Overview](assets/Finger_Overview.jpg)
@@ -56,10 +56,10 @@ Up to you !
     - [BOM (Bill Of Materials)](#bom-bill-of-materials)
     - [CAD Files and Onshape document](#cad-files-and-onshape-document)
     - [Assembly Guide](#assembly-guide)
-    - [Run_basic_Demo](#run-basic-demo)    
+    - [Run_basic_Demo](#run-basic-demo)
 - [Disclaimer](#disclaimer)
-- [AmazingHand advanced Demo](#amazinghand-advanced-demo)   
-- [Don't want to build it by yourself? Kits are available!](#don't-want-to-build-it-by-yourself-?)    
+- [AmazingHand advanced Demo](#amazinghand-advanced-demo)
+- [Don't want to build it by yourself? Kits are available!](#don't-want-to-build-it-by-yourself-?)
 - [Project Updates & Community](#project-updates-&-community)
     - [To Do List](#to-do-list)
     - [FAQ](#faq)
@@ -69,43 +69,43 @@ Up to you !
 
 # Build Resources
 ## BOM (Bill Of Materials)
-List of all needed components is available here:  
-[AmazingHand BOM](https://docs.google.com/spreadsheets/d/1QH2ePseqXjAhkWdS9oBYAcHPrxaxkSRCgM_kOK0m52E/edit?gid=1269903342#gid=1269903342)  
+List of all needed components is available here:
+[AmazingHand BOM](https://docs.google.com/spreadsheets/d/1QH2ePseqXjAhkWdS9oBYAcHPrxaxkSRCgM_kOK0m52E/edit?gid=1269903342#gid=1269903342)
 ![BOM](assets/BOM.jpg)
 
 And remember to add control choice cost (2 options detailed previously)
 
 
-Details for custom 3D printed parts are here: 
+Details for custom 3D printed parts are here:
 [3Dprinted parts](https://docs.google.com/spreadsheets/d/1QH2ePseqXjAhkWdS9oBYAcHPrxaxkSRCgM_kOK0m52E/edit?gid=2050623549#gid=2050623549)
 
 ![3Dparts](assets/3Dparts.jpg)
 
 Here is a guide explaining how to print all the needed custom parts:
 [=> 3D Printing Guide](/docs/AmazingHand_3DprintingTips.pdf)
-![3DPrint_example](/assets/3DPrint.jpg) 
+![3DPrint_example](/assets/3DPrint.jpg)
 
 
 
 ## CAD Files and Onshape document
-STL and Steps files can be found [here](https://github.com/pollen-robotics/AmazingHand/tree/main/cad) 
+STL and Steps files can be found [here](https://github.com/pollen-robotics/AmazingHand/tree/main/cad)
 
 Note that fingers are the same if you want to build a left hand, but some parts are symmetrical. Specific right hand parts are preceded by an "R", and other left hand parts by an "L".
 
 ![Heart](/assets/Heart.jpg)
 
-Everyone can access the Onshape document too:   
-[Link Onshape](https://cad.onshape.com/documents/430ff184cf3dd9557aaff2be/w/e3658b7152c139971d22c688/e/bd399bf1860732c6c6a2ee45?renderMode=0&uiState=6867fd3ef773466d059edf0c)  
+Everyone can access the Onshape document too:
+[Link Onshape](https://cad.onshape.com/documents/430ff184cf3dd9557aaff2be/w/e3658b7152c139971d22c688/e/bd399bf1860732c6c6a2ee45?renderMode=0&uiState=6867fd3ef773466d059edf0c)
 
 Note that predefined positions are available in the "named position" tooling, with corresponding servo angles
 
-![Onshape&Named_Pos](/assets/Named_Pos.jpg)  
+![Onshape&Named_Pos](/assets/Named_Pos.jpg)
 
 ## Assembly Guide
 
-Assembly guide for the Amazing Hand in combination with standard components in the BOM is here:  
-[=> Assembly Guide](/docs/AmazingHand_Assembly.pdf)  
-![Assembly_example](/assets/Assembly.jpg)  
+Assembly guide for the Amazing Hand in combination with standard components in the BOM is here:
+[=> Assembly Guide](/docs/AmazingHand_Assembly.pdf)
+![Assembly_example](/assets/Assembly.jpg)
 
 You will need a simple program / script to calibrate each finger, available here:
 - With Python & Waveshare serial bus driver: [here](https://github.com/pollen-robotics/AmazingHand/tree/main/PythonExample)
@@ -125,10 +125,10 @@ You will need an external power supply to be able to power the 8 actuators insid
 
 If you don't have one already, a simple external power supply could be a DC/DC 220V -> 5V / 2A adapter with jack connector.
 Check on the BOM list:
-[AmazingHand BOM](https://docs.google.com/spreadsheets/d/1QH2ePseqXjAhkWdS9oBYAcHPrxaxkSRCgM_kOK0m52E/edit?gid=1269903342#gid=1269903342) 
+[AmazingHand BOM](https://docs.google.com/spreadsheets/d/1QH2ePseqXjAhkWdS9oBYAcHPrxaxkSRCgM_kOK0m52E/edit?gid=1269903342#gid=1269903342)
 
 - Python script: "AmazingHand_Demo.py" [here](https://github.com/pollen-robotics/AmazingHand/tree/main/ArduinoExample)
-  
+
 - Arduino program: "AmazingHand_Demo.ino" [here](https://github.com/pollen-robotics/AmazingHand/tree/main/PythonExample)
 
 
@@ -178,9 +178,9 @@ https://shop.wowrobo.com/products/amazing-hand-the-open-source-robotic-hand-kit
 # Project Updates & Community
 ## Updates from community
 
-- ### Amazing Base for the amazing hand : 
+- ### Amazing Base for the amazing hand :
 ![Base](assets/Base.jpg)
-STL or Step file can be found [here](https://github.com/pollen-robotics/AmazingHand/tree/main/cad) 
+STL or Step file can be found [here](https://github.com/pollen-robotics/AmazingHand/tree/main/cad)
 
 - ### Specific Chinese BOM available here :
 [Chinese BOM](https://docs.google.com/spreadsheets/d/1fHZiTky79vyZwICj5UGP2c_RiuLLm89K8HrB3vpb2h4/edit?gid=837395814#gid=837395814)
@@ -204,7 +204,7 @@ Or directly on onshape workspace, folder "community update"
 
 ## To Do List
 - Design small custom pcb with serial hub and power supply functions, to fit everything in the hand
-- Test with prehensile tasks 
+- Test with prehensile tasks
       => Add smarter behaviour for closing hand, based on available motors feedbacks
 - Study possibility to have 4 different fingers length, or add a 5th finger
 - Study possibility to use STS3032 Feetech motors instead of SCS0009
@@ -218,14 +218,14 @@ WIP
 
 ## Contact
 
-You can reach public discord channel here : 
+You can reach public discord channel here :
 [Discord AmazingHand](https://discord.com/channels/519098054377340948/1395021147346698300)
 
-Or 
+Or
 [Contact me or Pollen Robotics](/docs/contact.md)
 
 ## Thank you
 Huge thanks to those who have contributed to this project so far:
 - [Steve N'Guyen](https://github.com/SteveNguyen) for beta testing, Feetech motors integration in Rustypot, Mujoco/Mink and hand tracking demo
-- [Pierre Rouanet](https://github.com/pierre-rouanet) for Feetech motors integration in pypot  
+- [Pierre Rouanet](https://github.com/pierre-rouanet) for Feetech motors integration in pypot
 - [Augustin Crampette](https://fr.linkedin.com/in/augustin-crampette) & [Matthieu Lapeyre](https://www.linkedin.com/in/matthieulapeyre/) for open discussions and mechanical advices

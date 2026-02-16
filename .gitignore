@@ -1,0 +1,3 @@
+*.pyc
+push.json
+.pytest_cache/

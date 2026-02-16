@@ -1,0 +1,33 @@
+# See https://pre-commit.com for usage. All hooks limited to PythonExample/.
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+        files: ^PythonExample/
+      - id: end-of-file-fixer
+        files: ^PythonExample/
+        exclude: \.pytest_cache
+      - id: check-yaml
+        files: ^PythonExample/
+      - id: check-added-large-files
+        args: ["--maxkb=1000"]
+        files: ^PythonExample/
+      - id: check-merge-conflict
+        files: ^PythonExample/
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.8.4
+    hooks:
+      - id: ruff
+        args: [--fix]
+        files: ^PythonExample/
+
+  - repo: local
+    hooks:
+      - id: pytest
+        name: pytest
+        entry: bash -c 'cd PythonExample && PYTHONPATH= pixi run python -m pytest tests/ -v'
+        language: system
+        pass_filenames: false
+        files: ^PythonExample/

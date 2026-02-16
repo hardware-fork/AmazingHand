@@ -35,5 +35,3 @@ Rx arduino pin connected to Tx pin on TTLinker / Tx arduino pin connected to Rx 
 ![Arduino_Mega_PortCom](../assets/Arduino_Mega.jpg)
 
 Rx and Tx pin used on arduino Mega are RX1 & TX1 (19 & 18)
-
-
