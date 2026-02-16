@@ -1,6 +1,8 @@
+# Note: Using 'python -m pip' instead of 'pip' to ensure pixi environment's pip is used.
+# Direct 'pip' command may resolve to system pip which is externally-managed (PEP 668).
 nodes:
   - id: hand_tracker
-    build: pip install -e HandTracking
+    build: python -m pip install -e HandTracking
     path: HandTracking/HandTracking/main.py
     inputs:
       tick: dora/timer/millis/50
@@ -8,7 +10,7 @@ nodes:
       - r_hand_pos
 
   - id: r_hand_simulation
-    build: pip install -e AHSimulation
+    build: python -m pip install -e AHSimulation
     path: AHSimulation/AHSimulation/mj_mink_right.py
     inputs:
       r_hand_pos: hand_tracker/r_hand_pos

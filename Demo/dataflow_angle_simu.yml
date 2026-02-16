@@ -1,6 +1,8 @@
+# Note: Using 'python -m pip' instead of 'pip' to ensure pixi environment's pip is used.
+# Direct 'pip' command may resolve to system pip which is externally-managed (PEP 668).
 nodes:
   - id: move_angle
-    build: pip install -e AHSimulation
+    build: python -m pip install -e AHSimulation
     path: AHSimulation/examples/finger_angle_control.py
     inputs:
       tick: dora/timer/millis/50
@@ -8,7 +10,7 @@ nodes:
       - hand_quat
 
   - id: hand_simulation_r
-    build: pip install -e AHSimulation
+    build: python -m pip install -e AHSimulation
     path: AHSimulation/AHSimulation/mj_mink_right.py
     inputs:
       r_hand_quat: move_angle/hand_quat
@@ -19,7 +21,7 @@ nodes:
     args: -m quat
 
   - id: hand_simulation_l
-    build: pip install -e AHSimulation
+    build: python -m pip install -e AHSimulation
     path: AHSimulation/AHSimulation/mj_mink_left.py
     inputs:
       l_hand_quat: move_angle/hand_quat
