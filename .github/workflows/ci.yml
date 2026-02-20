@@ -15,6 +15,9 @@ jobs:
         with:
           cache: ${{ !env.ACT }}
 
+      - name: Install system deps for AHControl (Rust)
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev pkg-config
+
       - name: Run pre-commit
         run: pixi run pre-commit run --all-files
 
