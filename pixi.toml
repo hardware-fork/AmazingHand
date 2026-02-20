@@ -37,4 +37,5 @@ qpsolvers = { version = ">=4.7.1", extras = ["quadprog"] }
 # PYTHONPATH= avoids loading system/ROS pytest plugins when run locally
 test-python-example = "cd PythonExample && PYTHONPATH= python -m pytest tests/ -v"
 test-demo = "cd Demo && python -m pytest tests/ -v"
+test-demo-mj-mink = "python -m pytest Demo/tests/test_mj_mink.py -v"
 test-ahcontrol = "cargo test --manifest-path Demo/Cargo.toml -p AHControl"

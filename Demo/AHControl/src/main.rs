@@ -86,14 +86,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                         if let Some(Parameter::ListInt(finger1_idx)) =
                             metadata.parameters.get(&finger.finger_name)
                         {
-                            println!(
-                                "metadata: name: {:?} idx {:?} data: {:?} {:?}",
-                                finger.finger_name,
-                                finger1_idx,
-                                buffer[finger1_idx[0] as usize],
-                                buffer[finger1_idx[1] as usize]
-                            );
-
                             motors_ids.push(finger.motor1.id);
                             motors_ids.push(finger.motor2.id);
 
