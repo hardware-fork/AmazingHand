@@ -1,50 +1,12 @@
 use clap::Parser;
-// use dora_node_api::{dora_core::config::NodeId, DoraNode, Event};
-
-// use dora_node_api::IntoArrow;
 use dora_node_api::{self, arrow::array::Array, DoraNode, Event, Parameter};
 use eyre::{eyre, Result};
 use rustypot::servo;
-use std::{error::Error, time::Duration};
+use std::path::Path;
+use std::{error::Error, time::Duration, thread};
 
-use facet::Facet;
+use AHControl::Fingers;
 use facet_pretty::FacetPretty;
-// use std::{collections::HashMap, path::PathBuf, sync::Arc};
-// use std::error::Error;
-// use arrow_convert::{
-//     deserialize::TryIntoCollection, serialize::TryIntoArrow, ArrowDeserialize, ArrowField,
-//     ArrowSerialize,
-// };
-use std::{fs, thread};
-
-// use std::io::Read;
-#[derive(Debug, Facet)]
-struct Fingers {
-    #[allow(dead_code)] // Disable dead code warning for the entire struct
-    motors: Vec<Motors>,
-}
-
-#[derive(Debug, Facet)]
-struct Motors {
-    #[allow(dead_code)] // Disable dead code warning for the entire struct
-    finger_name: String,
-    #[allow(dead_code)] // Disable dead code warning for the entire struct
-    motor1: Motor,
-    #[allow(dead_code)] // Disable dead code warning for the entire struct
-    motor2: Motor,
-}
-
-#[derive(Debug, Facet)]
-struct Motor {
-    #[allow(dead_code)]
-    id: u8,
-    #[allow(dead_code)]
-    offset: f64,
-    #[allow(dead_code)]
-    invert: bool,
-    #[allow(dead_code)]
-    model: String,
-}
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -66,10 +28,8 @@ fn main() -> Result<(), Box<dyn Error>> {
     let baudrate: u32 = args.baudrate;
     let configfile: String = args.config;
     println!("Opening {:?}", configfile);
-    let toml_str = fs::read_to_string(configfile).expect("Failed to read config file");
-
-    let motors_conf: Fingers =
-        facet_toml::from_str(&toml_str).expect("Failed to deserialize config file");
+    let motors_conf: Fingers = AHControl::load_fingers_from_path(Path::new(&configfile))
+        .map_err(|e| eyre!("config load failed: {}", e))?;
 
     println!("{}", motors_conf.pretty());
     let serial_port = serialport::new(serialport, baudrate)
@@ -133,13 +93,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                                 buffer[finger1_idx[0] as usize],
                                 buffer[finger1_idx[1] as usize]
                             );
-                            // controller.sync_write_goal_position(
-                            //     &[finger.motor1.id, finger.motor2.id],
-                            //     &[
-                            //         buffer[finger1_idx[0] as usize] + finger.motor1.offset,
-                            //         buffer[finger1_idx[1] as usize] + finger.motor2.offset,
-                            //     ],
-                            // )?;
 
                             motors_ids.push(finger.motor1.id);
                             motors_ids.push(finger.motor2.id);
@@ -155,16 +108,6 @@ fn main() -> Result<(), Box<dyn Error>> {
                             }
                             motors_goalpos.push(m2goal);
 
-                            // controller.write_goal_position(
-                            //     finger.motor1.id,
-                            //     buffer[finger1_idx[0] as usize] + finger.motor1.offset,
-                            // )?;
-                            // thread::sleep(Duration::from_millis(10));
-                            // controller.write_goal_position(
-                            //     finger.motor2.id,
-                            //     buffer[finger1_idx[1] as usize] + finger.motor2.offset,
-                            // )?;
-                            // thread::sleep(Duration::from_millis(10));
                         }
                     }
                     controller.sync_write_goal_position(&motors_ids, &motors_goalpos)?;

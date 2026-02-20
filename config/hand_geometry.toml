@@ -1,0 +1,4 @@
+# Shared hand geometry for both hands. No physical servo IDs.
+# Same structure for right and left. Rest positions come from calibration per physical hand.
+
+fingers = ["index", "middle", "ring", "thumb"]

@@ -20,36 +20,35 @@ From the repository root (where `pixi.toml` lives):
 
 ```bash
 pixi install   # one time setup
-# Optional: export AMAZINGHAND_TEAM=julia
+# Optional: export AMAZINGHAND_PROFILE=team_julia
 pixi run python PythonExample/AmazingHand_FingerTest.py
 ```
 
 To run another script, replace the filename, e.g. `PythonExample/AmazingHand_Hand_FingerMiddlePos.py` or `PythonExample/AmazingHand_Demo.py`.
 
-Set `AMAZINGHAND_TEAM` to choose config (e.g. `export AMAZINGHAND_TEAM=krishan`). Edit `PythonExample/config.toml` for serial port and finger settings.
-
-The hand must be connected via USB and the serial port in `config.toml` must match your system (e.g. `COM3` on Windows, `/dev/ttyUSB0` or `/dev/ttyACM0` on Linux). Leave `port = ""` to use the default for your OS. If the port is wrong or the device is unplugged, the script will fail with "No such file or directory".
+Set `AMAZINGHAND_PROFILE` to choose a profile (e.g. `team_julia`, `team_krishan`). Profiles and hand calibration live in `config/profiles.toml` and `config/calibration/`; see [canonical_hand_config_design.md](../docs/canonical_hand_config_design.md). The hand must be connected via USB; the profile's `port` must match your system (e.g. `COM3` on Windows, `/dev/ttyACM0` on Linux). If the port is wrong or the device is unplugged, the script will fail with "No such file or directory".
 
 ## Run Python Examples
 
 ### Hand Demo
 
-Runs a loop of gestures (open/close, spread, point, victory, etc.) on one hand. Which hand is controlled by config (`hand_test_id` or `side` in `config.toml`) or by `AMAZINGHAND_TEAM`. Override from the command line with `--side`:
+Runs a loop of gestures (open/close, spread, point, victory, etc.) on one hand. Which hand is controlled by the profile's `hand_test_id` or `side`, or override with `--side`:
 
 ```bash
+# export AMAZINGHAND_PROFILE=team_julia
 pixi run python PythonExample/AmazingHand_Demo.py
 # Right hand (1) or left hand (2):
 pixi run python PythonExample/AmazingHand_Demo.py --side 1
 ```
 
-Ensure the chosen hand's servo IDs and middle positions are set in `config.toml` for your team (see `hand_1_*` / `hand_2_*`).
+Set `AMAZINGHAND_PROFILE` (e.g. `team_julia`); the profile loads servo IDs and rest/middle positions from `config/calibration/`. See [canonical_hand_config_design.md](../docs/canonical_hand_config_design.md).
 
 ## Run Unit Tests
 
 From the repository root:
 
 ```bash
-pixi run test
+pixi run test-demo
 ```
 
 ## Pre-commit (optional)

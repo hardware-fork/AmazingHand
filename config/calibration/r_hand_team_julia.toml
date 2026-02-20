@@ -1,0 +1,18 @@
+# Per-physical-hand calibration: right hand (team_julia).
+# Logical role -> servo IDs and rest position (degrees). Anatomical order: index, middle, ring, thumb.
+
+[index]
+ids = [1, 2]
+rest_deg = [-2, 0]
+
+[middle]
+ids = [3, 4]
+rest_deg = [1, 2]
+
+[ring]
+ids = [6, 5]
+rest_deg = [-3, 8]
+
+[thumb]
+ids = [8, 7]
+rest_deg = [8, -8]

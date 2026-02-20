@@ -1,5 +1,6 @@
-# Note: Using 'python -m pip' instead of 'pip' to ensure pixi environment's pip is used.
-# Direct 'pip' command may resolve to system pip which is externally-managed (PEP 668).
+# Uses canonical calibration (config/calibration/). Dora spawns nodes with cwd = Demo/,
+# so path is relative to Demo: ../config/calibration/.
+# See docs/canonical_hand_config_design.md.
 nodes:
   - id: hand_tracker
     build: python -m pip install -e HandTracking
@@ -21,7 +22,7 @@ nodes:
 
   - id: hand_controller
     build: cargo build -p AHControl
-    path: target/debug/AHControl #--serialport /dev/ttyACM0 --config AHControl/config/r_hand.toml
-    args: --serialport /dev/ttyACM0 --config AHControl/config/r_hand_team_julia.toml
+    path: target/debug/AHControl
+    args: --serialport /dev/ttyACM0 --config ../config/calibration/r_hand_team_julia.toml
     inputs:
       mj_r_joints_pos: r_hand_simulation/mj_r_joints_pos

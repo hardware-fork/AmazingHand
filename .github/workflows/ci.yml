@@ -23,3 +23,6 @@ jobs:
 
       - name: Demo unit tests
         run: pixi run test-demo
+
+      - name: AHControl (Rust) unit tests
+        run: pixi run test-ahcontrol

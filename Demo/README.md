@@ -18,14 +18,21 @@ pixi run dora build Demo/dataflow_tracking_simu.yml   # once
 pixi run dora run Demo/dataflow_tracking_simu.yml
 ```
 
-Webcam hand tracking (real hardware):
+Webcam hand tracking (real hardware, new config):
 
 ```bash
-pixi run dora build Demo/dataflow_tracking_real.yml   # once
+pixi run dora build Demo/dataflow_tracking_real_team_julia.yml   # once
 pixi run dora run Demo/dataflow_tracking_real_team_julia.yml
 ```
 
-The config file is set in `Demo/dataflow_tracking_real.yml` (hand_controller `args`: change `--config AHControl/config/...` and `--serialport` as needed).
+Same demo using previous config
+
+```bash
+pixi run dora build Demo/dataflow_tracking_real.yml   # once
+pixi run dora run Demo/dataflow_tracking_real.yml
+```
+
+The hand config is set in the dataflow YAML (hand_controller `args`): change `--config` and `--serialport` as needed. You can use a legacy file under `AHControl/config/r_hand*.toml` or the repo canonical calibration (e.g. `--config config/calibration/r_hand_team_julia.toml` when running from repo root). See [AHControl](AHControl/README.md) and [canonical_hand_config_design.md](docs/canonical_hand_config_design.md) for details.
 
 Linux: add your user to the `dialout` group for serial port access: `sudo usermod -a -G dialout $USER` (log out and back in). If your hand is on a different port (e.g. `/dev/ttyUSB0`), edit `Demo/dataflow_tracking_real.yml` and change the `--serialport` arg.
 
@@ -63,8 +70,7 @@ The dataflow `build` steps install HandTracking and AHSimulation in editable mod
 
 ![Fingers naming](docs/r_hand.png "Fingers naming for each hand")
 
-Be sure to adapt the configuration file [r_hand.toml](AHControl/config/r_hand.toml) for your particular hand.
-You can use the software tools located in [AHControl](AHControl).
+Adapt the hand configuration for your setup: either the legacy [r_hand.toml](AHControl/config/r_hand.toml) (and copies like `r_hand_team_julia.toml`) under AHControl/config, or the repo canonical calibration files under `config/calibration/` (see [canonical_hand_config_design.md](../docs/canonical_hand_config_design.md)). Use the tools in [AHControl](AHControl) to calibrate.
 
 
 ## Details
