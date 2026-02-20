@@ -1,3 +1,13 @@
 *.pyc
 push.json
 .pytest_cache/
+
+# Python package metadata (pip install -e)
+*.egg-info/
+
+# Rust build output
+target/
+
+# Dora / local output and logs
+Demo/out/
+out/

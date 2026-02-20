@@ -18,5 +18,8 @@ jobs:
       - name: Run pre-commit
         run: pixi run pre-commit run --all-files
 
-      - name: Unit tests
-        run: pixi run test
+      - name: PythonExample unit tests
+        run: pixi run test-python-example
+
+      - name: Demo unit tests
+        run: pixi run test-demo

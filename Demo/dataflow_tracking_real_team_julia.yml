@@ -1,0 +1,27 @@
+# Note: Using 'python -m pip' instead of 'pip' to ensure pixi environment's pip is used.
+# Direct 'pip' command may resolve to system pip which is externally-managed (PEP 668).
+nodes:
+  - id: hand_tracker
+    build: python -m pip install -e HandTracking
+    path: HandTracking/HandTracking/main.py
+    inputs:
+      tick: dora/timer/millis/50
+    outputs:
+      - r_hand_pos
+
+  - id: r_hand_simulation
+    build: python -m pip install -e AHSimulation
+    path: AHSimulation/AHSimulation/mj_mink_right.py
+    inputs:
+      r_hand_pos: hand_tracker/r_hand_pos
+      tick: dora/timer/millis/2
+      tick_ctrl: dora/timer/millis/10
+    outputs:
+      - mj_r_joints_pos
+
+  - id: hand_controller
+    build: cargo build -p AHControl
+    path: target/debug/AHControl #--serialport /dev/ttyACM0 --config AHControl/config/r_hand.toml
+    args: --serialport /dev/ttyACM0 --config AHControl/config/r_hand_team_julia.toml
+    inputs:
+      mj_r_joints_pos: r_hand_simulation/mj_r_joints_pos
