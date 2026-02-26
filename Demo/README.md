@@ -1,6 +1,51 @@
 # Example control for the Pollen Robotics "AmazingHand" (a.k.a. AH!)
 
-## How to use:
+## Running with pixi
+
+Prerequisites: install [Pixi](https://pixi.prefix.dev/latest/installation/). Rust is needed for real hardware demos (AHControl).
+
+From the AmazingHand repository root:
+
+```bash
+pixi install
+pixi run dora up   # start daemon (in a separate terminal)
+```
+
+Webcam hand tracking (simulation only):
+
+```bash
+pixi run dora build Demo/dataflow_tracking_simu.yml   # once
+pixi run dora run Demo/dataflow_tracking_simu.yml
+```
+
+Webcam hand tracking (real hardware, new config):
+
+```bash
+pixi run dora build Demo/dataflow_tracking_real_team_julia.yml   # once
+pixi run dora run Demo/dataflow_tracking_real_team_julia.yml
+```
+
+Same demo using previous config
+
+```bash
+pixi run dora build Demo/dataflow_tracking_real.yml   # once
+pixi run dora run Demo/dataflow_tracking_real.yml
+```
+
+The hand config is set in the dataflow YAML (hand_controller `args`): change `--config` and `--serialport` as needed. You can use a legacy file under `AHControl/config/r_hand*.toml` or the repo canonical calibration (e.g. `--config config/calibration/r_hand_team_julia.toml` when running from repo root). See [AHControl](AHControl/README.md) and [canonical_hand_config_design.md](docs/canonical_hand_config_design.md) for details.
+
+Linux: add your user to the `dialout` group for serial port access: `sudo usermod -a -G dialout $USER` (log out and back in). If your hand is on a different port (e.g. `/dev/ttyUSB0`), edit `Demo/dataflow_tracking_real.yml` and change the `--serialport` arg.
+
+Finger angle control (simulation):
+
+```bash
+pixi run dora build Demo/dataflow_angle_simu.yml   # once
+pixi run dora run Demo/dataflow_angle_simu.yml
+```
+
+The dataflow `build` steps install HandTracking and AHSimulation in editable mode and build AHControl when needed.
+
+## How to use (uv):
 - Install Rust: https://www.rust-lang.org/tools/install
 - Install uv: https://docs.astral.sh/uv/getting-started/installation/
 - Install dora-rs: https://dora-rs.ai/docs/guides/Installation/installing
@@ -25,8 +70,7 @@
 
 ![Fingers naming](docs/r_hand.png "Fingers naming for each hand")
 
-Be sure to adapt the configuration file [r_hand.toml](AHControl/config/r_hand.toml) for your particular hand.
-You can use the software tools located in [AHControl](AHControl).
+Adapt the hand configuration for your setup: either the legacy [r_hand.toml](AHControl/config/r_hand.toml) (and copies like `r_hand_team_julia.toml`) under AHControl/config, or the repo canonical calibration files under `config/calibration/` (see [canonical_hand_config_design.md](../docs/canonical_hand_config_design.md)). Use the tools in [AHControl](AHControl) to calibrate.
 
 
 ## Details
@@ -34,3 +78,4 @@ You can use the software tools located in [AHControl](AHControl).
 - [AHControl](AHControl) contains a dora-rs node to control the motors, along with some useful tools to configure them.
 - [AHSimulation](AHSimulation) contains a dora-rs node to simulate the hand and get the inverse kinematics.
 - [HandTracking](HandTracking) contains a dora-rs node to track hands from a webcam and use it as target to control AH!.
+

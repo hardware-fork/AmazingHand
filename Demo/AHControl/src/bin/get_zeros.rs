@@ -1,42 +1,10 @@
 use clap::Parser;
-
 use eyre::{eyre, Result};
-use facet::Facet;
 use facet_pretty::FacetPretty;
 use rustypot::servo;
 use std::io;
-use std::{error::Error, time::Duration};
-
-use std::{fs, thread};
-
-// use std::io::Read;
-#[derive(Debug, Facet)]
-struct Fingers {
-    #[allow(dead_code)] // Disable dead code warning for the entire struct
-    motors: Vec<Motors>,
-}
-
-#[derive(Debug, Facet)]
-struct Motors {
-    #[allow(dead_code)] // Disable dead code warning for the entire struct
-    finger_name: String,
-    #[allow(dead_code)] // Disable dead code warning for the entire struct
-    motor1: Motor,
-    #[allow(dead_code)] // Disable dead code warning for the entire struct
-    motor2: Motor,
-}
-
-#[derive(Debug, Facet)]
-struct Motor {
-    #[allow(dead_code)]
-    id: u8,
-    #[allow(dead_code)]
-    offset: f64,
-    #[allow(dead_code)]
-    invert: bool,
-    #[allow(dead_code)]
-    model: String,
-}
+use std::path::Path;
+use std::{error::Error, time::Duration, thread};
 
 #[derive(Parser, Debug)]
 #[command(author, version, about, long_about = None)]
@@ -58,10 +26,9 @@ fn main() -> Result<(), Box<dyn Error>> {
     let baudrate: u32 = args.baudrate;
     let configfile: String = args.config;
     println!("Opening {:?}", configfile);
-    let toml_str = fs::read_to_string(configfile).expect("Failed to read config file");
-
-    let mut motors_conf: Fingers =
-        facet_toml::from_str(&toml_str).expect("Failed to deserialize config file");
+    let mut motors_conf: AHControl::Fingers =
+        AHControl::load_fingers_from_path(Path::new(&configfile))
+            .map_err(|e| eyre!("config load failed: {}", e))?;
 
     // println!("{}", motors_conf.pretty());
     let serial_port = serialport::new(serialport, baudrate)

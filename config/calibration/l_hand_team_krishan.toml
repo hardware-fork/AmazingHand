@@ -1,0 +1,18 @@
+# Per-physical-hand calibration: left hand (team_krishan).
+# Logical role -> servo IDs and rest position (degrees).
+
+[index]
+ids = [11, 12]
+rest_deg = [3, -3]
+
+[middle]
+ids = [13, 14]
+rest_deg = [-1, -10]
+
+[ring]
+ids = [15, 16]
+rest_deg = [5, 2]
+
+[thumb]
+ids = [17, 18]
+rest_deg = [-7, 3]

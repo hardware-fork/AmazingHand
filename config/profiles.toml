@@ -1,0 +1,28 @@
+# Named profiles for canonical hand config. Set AMAZINGHAND_PROFILE or pass profile name to load_config_canonical.
+# Each profile references calibration files (without .toml) and connection options.
+
+[profile.team_julia]
+right_hand_calibration = "r_hand_team_julia"
+left_hand_calibration = ""
+port = "/dev/ttyACM0"
+baudrate = 1000000
+timeout = 0.5
+side = 1
+max_speed = 7
+close_speed = 3
+finger_test_servo_ids = [6, 5]
+finger_test_middle_pos = [-3, 8]
+hand_test_id = 1
+
+[profile.team_krishan]
+right_hand_calibration = "r_hand_team_krishan"
+left_hand_calibration = "l_hand_team_krishan"
+port = "COM3"
+baudrate = 1000000
+timeout = 2.5
+side = 2
+max_speed = 7
+close_speed = 3
+finger_test_servo_ids = [13, 14]
+finger_test_middle_pos = [5, -2]
+hand_test_id = 2

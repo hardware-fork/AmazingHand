@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  push: {}
+  pull_request: {}
+  workflow_dispatch:
+
+jobs:
+  lint-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: prefix-dev/setup-pixi@v0.9.4
+        with:
+          cache: ${{ !env.ACT }}
+
+      - name: Install system deps for AHControl (Rust)
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev pkg-config
+
+      - name: Run pre-commit
+        run: pixi run pre-commit run --all-files
+
+      - name: PythonExample unit tests
+        run: pixi run test-python-example
+
+      - name: Demo unit tests
+        run: pixi run test-demo
+
+      - name: Demo AHSimulation (mj_mink) unit tests
+        run: pixi run test-demo-mj-mink
+
+      - name: AHControl (Rust) unit tests
+        run: pixi run test-ahcontrol
