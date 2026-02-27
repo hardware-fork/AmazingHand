@@ -4,6 +4,7 @@ push.json
 
 # Python package metadata (pip install -e)
 *.egg-info/
+dist/
 
 # Rust build output
 target/
@@ -11,3 +12,4 @@ target/
 # Dora / local output and logs
 Demo/out/
 out/
+*.code-workspace

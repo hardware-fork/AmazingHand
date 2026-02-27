@@ -21,6 +21,9 @@ jobs:
       - name: Run pre-commit
         run: pixi run pre-commit run --all-files
 
+      - name: SDK unit tests
+        run: pixi run test-sdk
+
       - name: PythonExample unit tests
         run: pixi run test-python-example
 

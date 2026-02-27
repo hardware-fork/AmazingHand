@@ -1,0 +1,16 @@
+# Bundled default profile. Override with AMAZINGHAND_CONFIG or config_root.
+# Set AMAZINGHAND_PROFILE to select profile (default: default).
+# Add calibration files under calibration/ and reference them below.
+
+[profile.default]
+right_hand_calibration = "right_hand"
+left_hand_calibration = ""
+port = ""
+baudrate = 1000000
+timeout = 0.5
+side = 1
+max_speed = 7
+close_speed = 3
+finger_test_servo_ids = [0, 0]
+finger_test_middle_pos = [0, 0]
+hand_test_id = 1
