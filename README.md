@@ -1,6 +1,5 @@
 Project is licensed under [Apache 2.0](https://www.apache.org/licenses/LICENSE-2.0)
 
-
 Mechanical design is licensed under a:
 [Creative Commons Attribution 4.0 International License][cc-by].
 [![CC BY 4.0][cc-by-image]][cc-by]
@@ -10,7 +9,15 @@ Mechanical design is licensed under a:
 [cc-by-image]: https://licensebuttons.net/l/by/4.0/88x31.png
 [cc-by-shield]: https://img.shields.io/badge/License-CC%20BY-lightgrey.svg
 
+# Fork Notice
 
+This repository is a fork of [pollen-robotics/AmazingHand](https://github.com/pollen-robotics/AmazingHand). We are grateful to Pollen Robotics for the original project.
+
+We no longer sync with upstream. Our fork has evolved for our own needs: refactoring for unit testing, maintainability, and integration with our tooling (pixi, cross-platform support). The codebases have diverged enough that merging upstream is no longer practical.
+
+If you need changes from the original repo, we recommend porting them by hand. For a summary of how this repo differs from upstream, see [FORK.md](FORK.md).
+
+Below is the original readme content. 
 
 # Amazing Hand project
 

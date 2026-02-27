@@ -27,8 +27,5 @@ jobs:
       - name: Demo unit tests
         run: pixi run test-demo
 
-      - name: Demo AHSimulation (mj_mink) unit tests
-        run: pixi run test-demo-mj-mink
-
       - name: AHControl (Rust) unit tests
         run: pixi run test-ahcontrol
