@@ -1,6 +1,3 @@
-# Original authors: Pollen Robotics, AmazingHand authors.
-# See: https://github.com/pollen-robotics/AmazingHand
-#
 # Copyright (C) 2026 Julia Jia
 #
 # Licensed under the Apache License, Version 2.0 (the "License");

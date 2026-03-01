@@ -1,7 +1,7 @@
 [workspace]
 name = "amazinghand"
 version = "0.1.0"
-description = "Amazing Hand - Python examples and demos (Pollen Robotics)"
+description = "Amazing Hand - Python examples and demos (hardware-fork/Pollen Robotics)"
 channels = ["conda-forge"]
 # Ubuntu (x86_64), Windows (x64), Raspberry Pi (aarch64)
 platforms = ["linux-64", "win-64", "linux-aarch64", "osx-arm64"]
@@ -10,6 +10,10 @@ platforms = ["linux-64", "win-64", "linux-aarch64", "osx-arm64"]
 python = "3.12.*"
 pip = "*"
 rust = "*"
+
+[target.win-64.dependencies]
+# Provides activation that runs vcvars64, putting MSVC link.exe on PATH so Rust finds it (not Git's link)
+vs2022_win-64 = "*"
 
 [target.linux-64.activation.env]
 # Use system GCC for Rust linking; conda's toolchain can fail with __libc_csu_* symbols on Linux
@@ -34,8 +38,17 @@ onshape-to-robot = ">=1.7.5"
 qpsolvers = { version = ">=4.7.1", extras = ["quadprog"] }
 
 [tasks]
-# PYTHONPATH= avoids loading system/ROS pytest plugins when run locally
+
+# Unit test related
+# PYTHONPATH= avoids loading system/ROS pytest plugins when run locally (works in Git Bash and Unix)
 test-python-example = "cd PythonExample && PYTHONPATH= python -m pytest tests/ -v"
 test-demo = "cd Demo && python -m pytest tests/ -v"
-test-demo-mj-mink = "python -m pytest Demo/tests/test_mj_mink.py -v"
 test-ahcontrol = "cargo test --manifest-path Demo/Cargo.toml -p AHControl"
+
+# build related
+build-ahcontrol = "cargo build --release --manifest-path Demo/Cargo.toml -p AHControl"
+
+# dora demos (run from repo root; when used as submodule, use path from parent repo)
+dora-build-angle-simu = "dora build Demo/dataflow_angle_simu.yml"
+dora-run-angle-simu = "dora run Demo/dataflow_angle_simu.yml"
+
