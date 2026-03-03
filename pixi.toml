@@ -38,6 +38,7 @@ mink = ">=0.0.11"
 mujoco = ">=3.3.2"
 onshape-to-robot = ">=1.7.5"
 qpsolvers = { version = ">=4.7.1", extras = ["quadprog"] }
+pyserial = ">=3.5"
 
 [tasks]
 
@@ -59,4 +60,7 @@ publish-pypi = "python -m build && twine upload dist/*"
 # dora demos (run from repo root; when used as submodule, use path from parent repo)
 dora-build-angle-simu = "dora build Demo/dataflow_angle_simu.yml"
 dora-run-angle-simu = "dora run Demo/dataflow_angle_simu.yml"
+
+# Device check (webcam indices, serial ports) before running demos
+check-devices = "python Demo/scripts/check_devices.py"
 

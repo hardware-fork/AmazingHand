@@ -15,6 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import logging
 import os
 import sys
 from pathlib import Path
@@ -26,6 +27,7 @@ try:
 except ImportError:
     tomllib = None
 
+_log = logging.getLogger(__name__)
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _CANONICAL_CONFIG_ROOT = _REPO_ROOT / "config"
 _PROFILE_ENV = "AMAZINGHAND_PROFILE"
@@ -155,10 +157,16 @@ def load_config_canonical(profile=None, config_root=None):
         return _DEFAULTS.copy()
     with open(profiles_path, "rb") as f:
         data = tomllib.load(f)
-    name = (profile or os.environ.get(_PROFILE_ENV) or "team_julia").strip().lower()
+    name = (profile or os.environ.get(_PROFILE_ENV) or "team_krishan").strip().lower()
+    source = "argument" if profile else ("env " + _PROFILE_ENV if os.environ.get(_PROFILE_ENV) else "default")
     section = data.get("profile", {}).get(name, {})
     if not section:
+        _log.warning(
+            "Profile %r not found in profiles.toml; using defaults. Set %s to a valid profile name.",
+            name, _PROFILE_ENV
+        )
         return _DEFAULTS.copy()
+    print(f"Using profile {name!r} (from {source}). Set {_PROFILE_ENV} to override.")
     out = {
         "port": (section.get("port") or _DEFAULTS["port"]) or "",
         "baudrate": section.get("baudrate", _DEFAULTS["baudrate"]),
