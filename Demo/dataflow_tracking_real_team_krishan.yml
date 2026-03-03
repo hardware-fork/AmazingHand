@@ -1,0 +1,28 @@
+# team_krishan (left hand), Windows: AHControl.exe, COM port.
+# Dora spawns nodes with cwd = Demo/, path relative to Demo.
+# See docs/canonical_hand_config_design.md.
+nodes:
+  - id: hand_tracker
+    build: python -m pip install -e HandTracking
+    path: HandTracking/HandTracking/main.py
+    inputs:
+      tick: dora/timer/millis/50
+    outputs:
+      - l_hand_pos
+
+  - id: l_hand_simulation
+    build: python -m pip install -e AHSimulation
+    path: AHSimulation/AHSimulation/mj_mink_left.py
+    inputs:
+      l_hand_pos: hand_tracker/l_hand_pos
+      tick: dora/timer/millis/2
+      tick_ctrl: dora/timer/millis/10
+    outputs:
+      - mj_l_joints_pos
+
+  - id: hand_controller
+    build: cargo build -p AHControl
+    path: target/debug/AHControl.exe
+    args: --serialport COM3 --config ../config/calibration/l_hand_team_krishan.toml
+    inputs:
+      mj_l_joints_pos: l_hand_simulation/mj_l_joints_pos
