@@ -1,0 +1,38 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "amazinghand"
+version = "0.1.0"
+description = "SDK for Amazing Hand robotic hand (hardware-fork org)"
+readme = "README_PKG.md"
+license = { text = "Apache-2.0" }
+requires-python = ">=3.12"
+authors = [{ name = "Julia Jia" }, { name = "Krishan Bhakta" }]
+keywords = ["robotics", "hand", "servo", "pollen"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "numpy>=1.20",
+    "rustypot",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=7.0"]
+
+[project.urls]
+Repository = "https://github.com/hardware-fork/AmazingHand"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]
+
+[tool.setuptools.package-data]
+amazinghand = ["config/*.toml", "config/calibration/*.toml"]

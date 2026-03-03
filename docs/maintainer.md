@@ -54,4 +54,38 @@ act push
 act pull_request
 ```
 
+## Publishing to PyPI
+
+Build the package:
+
+```bash
+pixi run build-python
+```
+
+Publish to Test PyPI and PyPI:
+
+```bash
+pixi run publish-testpypi
+pixi run publish-pypi
+```
+
+Configure credentials in `~/.pypirc` so twine does not prompt:
+
+```ini
+[distutils]
+index-servers =
+    pypi
+    testpypi
+
+[testpypi]
+repository = https://test.pypi.org/legacy/
+username = __token__
+password = pypi-xxxxxxxx
+
+[pypi]
+username = __token__
+password = pypi-xxxxxxxx
+```
+
+Replace `pypi-xxxxxxxx` with your API token from PyPI account settings. Create separate tokens for Test PyPI and PyPI if needed.
 

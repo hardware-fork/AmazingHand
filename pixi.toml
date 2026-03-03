@@ -26,6 +26,8 @@ numpy = ">=1.20"
 rustypot = "*"
 pytest = "*"
 pre-commit = "*"
+build = "*"
+twine = "*"
 # Demo/HandTracking, Demo/AHSimulation
 opencv-python = ">=4.8.0"
 mediapipe = ">=0.10.14,<=0.10.15"
@@ -36,6 +38,7 @@ mink = ">=0.0.11"
 mujoco = ">=3.3.2"
 onshape-to-robot = ">=1.7.5"
 qpsolvers = { version = ">=4.7.1", extras = ["quadprog"] }
+pyserial = ">=3.5"
 
 [tasks]
 
@@ -44,11 +47,20 @@ qpsolvers = { version = ">=4.7.1", extras = ["quadprog"] }
 test-python-example = "cd PythonExample && PYTHONPATH= python -m pytest tests/ -v"
 test-demo = "cd Demo && python -m pytest tests/ -v"
 test-ahcontrol = "cargo test --manifest-path Demo/Cargo.toml -p AHControl"
+test-sdk = "python -m pytest tests/ -v"
 
 # build related
 build-ahcontrol = "cargo build --release --manifest-path Demo/Cargo.toml -p AHControl"
+build-python = "python -m build"
+
+# publish (set TWINE_USERNAME and TWINE_PASSWORD or use --password from prompt)
+publish-testpypi = "python -m build && twine upload --repository testpypi dist/*"
+publish-pypi = "python -m build && twine upload dist/*"
 
 # dora demos (run from repo root; when used as submodule, use path from parent repo)
 dora-build-angle-simu = "dora build Demo/dataflow_angle_simu.yml"
 dora-run-angle-simu = "dora run Demo/dataflow_angle_simu.yml"
+
+# Device check (webcam indices, serial ports) before running demos
+check-devices = "python Demo/scripts/check_devices.py"
 

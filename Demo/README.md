@@ -2,7 +2,7 @@
 
 ## Running with pixi
 
-Prerequisites: install [Pixi](https://pixi.prefix.dev/latest/installation/). Rust is needed for real hardware demos (AHControl). Before running real hardware demos, check the serial port in the dataflow YAML: the default is Linux (`/dev/ttyACM0`); on Windows use your COM port (e.g. `COM3`).
+Prerequisites: install [Pixi](https://pixi.prefix.dev/latest/installation/). Rust is needed for real hardware demos (AHControl). Before running real hardware demos, check the serial port in the dataflow YAML: the default is Linux (`/dev/ttyACM0`); on Windows use your COM port (e.g. `COM3`). Run `pixi run check-devices` to list webcam indices and serial ports.
 
 From the AmazingHand repository root (Git Bash on Windows, or a Unix shell on Linux/macOS):
 
