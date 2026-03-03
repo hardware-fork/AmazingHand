@@ -1,0 +1,18 @@
+# Right hand calibration template. Copy to left_hand.toml for left hand.
+# Reference from profiles.toml via right_hand_calibration / left_hand_calibration.
+
+[index]
+ids = [1, 2]
+rest_deg = [0, 0]
+
+[middle]
+ids = [3, 4]
+rest_deg = [0, 0]
+
+[ring]
+ids = [5, 6]
+rest_deg = [0, 0]
+
+[thumb]
+ids = [7, 8]
+rest_deg = [0, 0]
