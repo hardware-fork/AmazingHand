@@ -18,6 +18,10 @@ Python package for named poses and raw angles. See [README_PKG.md](README_PKG.md
 
 GitHub Actions for lint (pre-commit), SDK, PythonExample, Demo, and AHControl tests. See [.github/workflows/ci.yml](.github/workflows/ci.yml).
 
+## Debug: check-devices
+
+Pixi task `pixi run check-devices` lists webcam indices and serial ports. Use before running demos to verify device paths.
+
 ## Other Changes
 
 Pixi for dependency management; unit tests for SDK, PythonExample, Demo, and AHControl; Dora/MuJoCo simulation demos; pre-commit hooks.
