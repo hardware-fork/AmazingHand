@@ -39,6 +39,16 @@ mujoco = ">=3.3.2"
 onshape-to-robot = ">=1.7.5"
 qpsolvers = { version = ">=4.7.1", extras = ["quadprog"] }
 pyserial = ">=3.5"
+# Demo/Sensors — tactile sensing, haptic feedback, visualisation
+lgpio      = "*"
+spidev     = "*"
+loguru     = "*"
+PySide6    = "*"
+pyqtgraph  = "*"
+bokeh      = "*"
+pandas     = "*"
+gitpython  = "*"
+gpiozero   = "*"
 
 [tasks]
 

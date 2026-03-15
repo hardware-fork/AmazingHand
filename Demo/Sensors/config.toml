@@ -1,0 +1,30 @@
+# AmazingHand — Tactile Sensor Configuration
+
+[hardware]
+# GPIO pin definitions (BCM numbering) — Waveshare HAT
+rst_pin    = 18
+cs_pin     = 22
+cs_dac_pin = 23
+drdy_pin   = 17
+
+# SPI settings
+# Max SPI clock = fCLKIN/4.  Default CLKIN=7.68 MHz → ~1.92 MHz.
+# 1 MHz is safe across cable lengths.
+spi_max_speed_hz = 1_000_000
+spi_mode         = 1  # CPOL=0, CPHA=1 (0b01)
+
+[sensor]
+channels      = [3, 4, 5, 6, 7]
+channel_names = ["thumb", "index", "middle", "ring", "pinky"]
+polling_hz    = 100.0
+fsr_vcc       = 5.0
+fsr_r_fixed   = 10_000.0
+gain_key      = "ADS1256_GAIN_1"
+drate_key     = "ADS1256_30000SPS"
+
+[logging]
+log_dir = "Demo/Sensors/logs"
+
+[visualization]
+plot_window_secs = 10.0
+voltage_ymax     = 5.5
