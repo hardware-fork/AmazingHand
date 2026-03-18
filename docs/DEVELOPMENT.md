@@ -42,7 +42,26 @@ pixi run test-ahcontrol
 Windows only (Rust / test-ahcontrol): `pixi.toml` adds `vs2022_win-64` for win-64, which activates the MSVC toolchain (via vcvars64) when you run `pixi shell` or `pixi run`. You must have Visual Studio or Build Tools installed first (see Appendix). If you get a linker error (e.g. "extra operand", "link.exe not found"), install Build Tools per the Appendix, then run `pixi install` to refresh the environment. As a fallback, run `pixi run test-ahcontrol` from "x64 Native Tools Command Prompt for VS" (Start menu).
 
 ## Setup (Raspberry Pi)
-Planned and upcoming.
+Raspberry Pi support is experimental and focuses on the haptic/tactile demos.
+
+On Raspberry Pi OS (Debian-based), install system GPIO dependencies first:
+
+```bash
+sudo apt-get update
+sudo apt-get install liblgpio-dev
+```
+
+Then create the pixi environment from the repository root:
+
+```bash
+pixi install
+```
+
+You can now run the haptic/tactile sensor test (from the repo root):
+
+```bash
+pixi run python -m Demo.Sensors.haptic_test
+```
 
 ## Run Demos
 

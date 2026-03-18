@@ -10,6 +10,8 @@ platforms = ["linux-64", "win-64", "linux-aarch64", "osx-arm64"]
 python = "3.12.*"
 pip = "*"
 rust = "*"
+pyside6 = "*"
+swig = "*"
 
 [target.win-64.dependencies]
 # Provides activation that runs vcvars64, putting MSVC link.exe on PATH so Rust finds it (not Git's link)
@@ -43,7 +45,6 @@ pyserial = ">=3.5"
 lgpio      = "*"
 spidev     = "*"
 loguru     = "*"
-PySide6    = "*"
 pyqtgraph  = "*"
 bokeh      = "*"
 pandas     = "*"
