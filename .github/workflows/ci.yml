@@ -11,12 +11,12 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Install system deps
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev pkg-config liblgpio-dev
+
       - uses: prefix-dev/setup-pixi@v0.9.4
         with:
           cache: ${{ !env.ACT }}
-
-      - name: Install system deps for AHControl (Rust)
-        run: sudo apt-get update && sudo apt-get install -y libudev-dev pkg-config liblgpio-dev
 
       - name: Run pre-commit
         run: pixi run pre-commit run --all-files
