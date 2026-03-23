@@ -285,6 +285,8 @@ class DataLogger:
         logger.info("CSV logger opened: {}", fname)
 
     def write(self, reading: TactileReading) -> None:
+        if self._file.closed:
+            return
         for row in reading.as_rows():
             self._writer.writerow(row)
         self._row_count += len(reading.raw)
@@ -476,19 +478,37 @@ def _run_gui(sensor: TactileSensor, csv_logger: DataLogger | None,
 
             self.resize(900, max(400, len(names) // 2 * 160 + 60))
 
-            # Wire sensor callback through a Qt signal (thread-safe)
-            self._bridge = _SensorBridge()
-            self._bridge.new_reading.connect(self._on_reading)
-            sensor._on_reading = self._bridge.new_reading.emit  # type: ignore[assignment]
+            # Latest reading written by the sensor polling thread; read by the
+            # GUI refresh timer.  Single-object assignment is atomic under the
+            # GIL so no explicit lock is needed.
+            self._pending_reading: TactileReading | None = None
 
+            # CSV writes happen in the sensor polling thread (not the GUI
+            # thread) so heavy I/O never blocks the event loop.
+            def _sensor_callback(reading: TactileReading) -> None:
+                if csv_logger is not None:
+                    csv_logger.write(reading)
+                self._pending_reading = reading
+
+            sensor._on_reading = _sensor_callback  # type: ignore[assignment]
+
+            # Refresh plots at ~30 Hz regardless of sensor polling rate.
             self._sample_count = 0
+            refresh_timer = QTimer(self)
+            refresh_timer.timeout.connect(self._refresh_plots)
+            refresh_timer.start(33)   # ~30 Hz
+
             fps_timer = QTimer(self)
             fps_timer.timeout.connect(self._update_fps)
             fps_timer.start(1000)
 
             logger.info("GUI window created for channels: {}", names)
 
-        def _on_reading(self, reading: TactileReading) -> None:
+        def _refresh_plots(self) -> None:
+            reading = self._pending_reading
+            if reading is None:
+                return
+            self._pending_reading = None
             t_rel = time.perf_counter() - self._t0
             for name, cp in self._channel_plots.items():
                 cp.update_data(
@@ -496,8 +516,6 @@ def _run_gui(sensor: TactileSensor, csv_logger: DataLogger | None,
                     reading.volts.get(name, 0.0),
                     reading.force_norm.get(name, 0.0),
                 )
-            if csv_logger is not None:
-                csv_logger.write(reading)
             self._sample_count += 1
             self._status_label.setText(
                 f"t={t_rel:.1f}s  sensor_t={reading.sensor_time:.3f}s"
@@ -508,17 +526,35 @@ def _run_gui(sensor: TactileSensor, csv_logger: DataLogger | None,
             self._sample_count = 0
 
         def closeEvent(self, event) -> None:
+            # Stop the sensor callback so no new readings arrive after close.
+            sensor._on_reading = None  # type: ignore[assignment]
+            self._pending_reading = None
             logger.info("Window closing — stopping sensor")
-            sensor.stop()
-            if csv_logger is not None:
-                csv_logger.close()
             super().closeEvent(event)
+            QApplication.instance().quit()
 
+    import os
+    import signal
+    os.environ.setdefault("QT_QPA_PLATFORMTHEME", "")
     app = QApplication.instance() or QApplication(sys.argv)
     app.setStyle("Fusion")
     window = TactileGUI()
     window.show()
+
+    # Allow Ctrl+C (SIGINT) to quit the Qt event loop.
+    # Qt blocks Python signal delivery during event processing, so a short
+    # timer wakes the loop periodically to let Python check for signals.
+    signal.signal(signal.SIGINT, lambda *_: app.quit())
+    _sigint_timer = QTimer()
+    _sigint_timer.start(200)
+    _sigint_timer.timeout.connect(lambda: None)
+
     exit_code = app.exec()
+    # Cleanup happens here, after the event loop exits, so the GUI thread
+    # is never blocked during window close.
+    sensor.stop()
+    if csv_logger is not None:
+        csv_logger.close()
     logger.info("Application exited with code {}", exit_code)
     sys.exit(exit_code)
 

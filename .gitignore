@@ -13,3 +13,8 @@ target/
 Demo/out/
 out/
 *.code-workspace
+
+# Log, CSV, and HTML plot files
+*.log
+*.csv
+*.html

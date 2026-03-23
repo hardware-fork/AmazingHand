@@ -18,7 +18,11 @@
 
 - **ADC HAT**: [Waveshare High-Precision AD HAT](https://www.waveshare.com/wiki/High-Precision_AD_HAT)
   - ADS1256: 24-bit, 8 single-ended channels, SPI
-- **Sensors**: FSR (Force Sensitive Resistors) wired in a voltage-divider circuit with a fixed resistor (default 10 kΩ) to each ADC input channel.
+- **Sensors**: FSR (Force Sensitive Resistors) wired in a voltage-divider circuit with a **5.1 kΩ resistor** in series with each FSR to each ADC input channel.
+
+### FSR Wiring Diagram
+
+![FSR Wiring Diagram](images/fsr_wiring_diagram.png)
 
 ### SPI Wiring (BCM pin numbers, set in `config.toml`)
 
@@ -67,10 +71,22 @@ pixi run python -m Demo.Sensors.tactile_sensing --help
 
 ### Offline Visualization
 
+Run without arguments to automatically load the **latest** `tactile_*.csv` from the log directory configured in `config.toml` (`[logging] log_dir`):
+
 ```bash
 pixi run python Demo/Sensors/tactile_sensing_post_visualize.py
-# or point at a specific file:
+```
+
+To visualize a **specific file**, pass it with `--file`:
+
+```bash
 pixi run python Demo/Sensors/tactile_sensing_post_visualize.py --file Demo/Sensors/logs/tactile_20260101_120000.csv
+```
+
+See all flags:
+
+```bash
+pixi run python Demo/Sensors/tactile_sensing_post_visualize.py --help
 ```
 
 CSV schema (long format — one row per channel per sample):
@@ -81,7 +97,7 @@ sensor_time, channel, raw, volts, force_norm
 
 ### Tuning `fsr_r_fixed`
 
-The `fsr_r_fixed` parameter (default 10 000 Ω) must match the resistor you place in series with each FSR to form the voltage divider. Larger values increase sensitivity at low force; smaller values increase the measurable force range.
+The `fsr_r_fixed` parameter must match the resistor you place in series with each FSR to form the voltage divider. The build uses **5 100 Ω (5.1 kΩ)**. Larger values increase sensitivity at low force; smaller values increase the measurable force range.
 
 ---
 

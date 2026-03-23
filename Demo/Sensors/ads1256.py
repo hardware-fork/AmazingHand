@@ -30,7 +30,7 @@ _SPI_MODE         : int = _hw["spi_mode"]
 # Hardware handles
 # ---------------------------------------------------------------------------
 _SPI = spidev.SpiDev(0, 0)
-_h: lgpio.lgpio | None = None
+_h: int | None = None
 
 
 # ---------------------------------------------------------------------------
@@ -63,7 +63,7 @@ def _spi_read(n: int) -> list[int]:
 
 def _hw_init() -> None:
     global _h
-    _h = lgpio.gpiochip_open(0)
+    _h = lgpio.gpiochip_open(4)
     lgpio.gpio_claim_output(_h, _RST_PIN)
     lgpio.gpio_claim_output(_h, _CS_DAC_PIN)
     lgpio.gpio_claim_output(_h, _CS_PIN)
