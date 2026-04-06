@@ -5,7 +5,7 @@ Expected CSV schema (long format, one row per channel per sample):
     sensor_time, channel, raw, volts, force_norm
 
 The default log directory is read from config.toml ([logging] log_dir),
-resolved relative to this file's directory (Demo/Sensors/).
+resolved relative to the current working directory.
 """
 
 import argparse
@@ -26,8 +26,9 @@ _CONFIG_PATH = Path(__file__).parent / "config.toml"
 with _CONFIG_PATH.open("rb") as _f:
     _TOML = tomllib.load(_f)
 
-_SENSORS_DIR = Path(__file__).parent
-_LOG_DIR     = _SENSORS_DIR / _TOML["logging"]["log_dir"]
+# Log dir is relative to the current working directory so it matches where
+# tactile_sensing.py writes CSV files.
+_LOG_DIR = Path(_TOML["logging"]["log_dir"])
 
 
 # ---------------------------------------------------------------------------

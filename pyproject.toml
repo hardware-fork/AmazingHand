@@ -36,3 +36,4 @@ pythonpath = ["src"]
 
 [tool.setuptools.package-data]
 amazinghand = ["config/*.toml", "config/calibration/*.toml"]
+amazinghand_sensors = ["config.toml", "images/*"]

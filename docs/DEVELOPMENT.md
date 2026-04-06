@@ -60,7 +60,7 @@ pixi install
 You can now run the haptic/tactile sensor test (from the repo root):
 
 ```bash
-pixi run python -m Demo.Sensors.haptic_test
+pixi run python -m amazinghand_sensors.haptic_test
 ```
 
 ## Run Demos

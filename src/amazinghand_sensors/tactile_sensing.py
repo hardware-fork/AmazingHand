@@ -22,8 +22,8 @@ from pathlib import Path
 
 from loguru import logger
 
-import Demo.Sensors.ads1256 as _ads1256_mod
-from Demo.Sensors.ads1256 import ADS1256
+import amazinghand_sensors.ads1256 as _ads1256_mod
+from amazinghand_sensors.ads1256 import ADS1256
 
 # ---------------------------------------------------------------------------
 # Load shared settings from config.toml
@@ -38,9 +38,9 @@ _SENSOR_CFG = _TOML["sensor"]
 _LOG_CFG    = _TOML["logging"]
 _VIZ_CFG    = _TOML["visualization"]
 
-# Paths resolved relative to this file's directory (Demo/Sensors/)
-_SENSORS_DIR = Path(__file__).parent
-_LOG_DIR     = _SENSORS_DIR / _LOG_CFG["log_dir"]
+# Log dir is relative to the current working directory so it lands next to
+# wherever the user invokes the script, not inside the installed package.
+_LOG_DIR = Path(_LOG_CFG["log_dir"])
 
 
 # ---------------------------------------------------------------------------

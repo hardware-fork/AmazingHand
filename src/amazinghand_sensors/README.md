@@ -56,17 +56,17 @@ pixi add --pypi lgpio
 
 **GUI (default):**
 ```bash
-pixi run python -m Demo.Sensors.tactile_sensing
+pixi run python -m amazinghand_sensors.tactile_sensing
 ```
 
 **Terminal only (no GUI window):**
 ```bash
-pixi run python -m Demo.Sensors.tactile_sensing --terminal
+pixi run python -m amazinghand_sensors.tactile_sensing --terminal
 ```
 
 See all flags:
 ```bash
-pixi run python -m Demo.Sensors.tactile_sensing --help
+pixi run python -m amazinghand_sensors.tactile_sensing --help
 ```
 
 ### Offline Visualization
@@ -74,19 +74,19 @@ pixi run python -m Demo.Sensors.tactile_sensing --help
 Run without arguments to automatically load the **latest** `tactile_*.csv` from the log directory configured in `config.toml` (`[logging] log_dir`):
 
 ```bash
-pixi run python Demo/Sensors/tactile_sensing_post_visualize.py
+pixi run python -m amazinghand_sensors.tactile_sensing_post_visualize
 ```
 
 To visualize a **specific file**, pass it with `--file`:
 
 ```bash
-pixi run python Demo/Sensors/tactile_sensing_post_visualize.py --file Demo/Sensors/logs/tactile_20260101_120000.csv
+pixi run python -m amazinghand_sensors.tactile_sensing_post_visualize --file LOGS/tactile_20260101_120000.csv
 ```
 
 See all flags:
 
 ```bash
-pixi run python Demo/Sensors/tactile_sensing_post_visualize.py --help
+pixi run python -m amazinghand_sensors.tactile_sensing_post_visualize --help
 ```
 
 CSV schema (long format — one row per channel per sample):
@@ -133,7 +133,7 @@ Safe choices for the PWM output include GPIO 12, 13 (hardware PWM), 24, 25, 26, 
 ### Usage
 
 ```python
-from Demo.Sensors.haptic_coin import HapticCoin
+from amazinghand_sensors.haptic_coin import HapticCoin
 
 motor = HapticCoin(gpio_pin=19)
 motor.vibrate_once(intensity=0.8, duration_s=0.5)
@@ -143,5 +143,5 @@ motor.cleanup()
 Run the example test script as a module so relative imports resolve:
 
 ```bash
-pixi run python -m Demo.Sensors.haptic_test
+pixi run python -m amazinghand_sensors.haptic_test
 ```
