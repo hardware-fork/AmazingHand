@@ -1,4 +1,4 @@
-from time import sleep
+from time import monotonic, sleep
 
 from gpiozero import PWMLED
 from loguru import logger
@@ -39,16 +39,22 @@ class HapticCoin:
         if self.motor is None:
             return
         try:
+            # monotonic() is used here for drift-free scheduling; use perf_counter() instead
+            # if step timing drops below ~1 ms and sub-millisecond resolution becomes critical.
+            next_tick = monotonic()
             while True:
                 logger.debug("Ramping up")
                 for duty in range(0, 101, step):
                     self.motor.value = duty / 100.0
-                    sleep(delay_s)
+                    next_tick += delay_s
+                    sleep(max(0.0, next_tick - monotonic()))
                 logger.debug("Ramping down")
                 for duty in range(100, -1, -step):
                     self.motor.value = duty / 100.0
-                    sleep(delay_s)
-                sleep(pause_s)
+                    next_tick += delay_s
+                    sleep(max(0.0, next_tick - monotonic()))
+                next_tick += pause_s
+                sleep(max(0.0, next_tick - monotonic()))
         except KeyboardInterrupt:
             logger.info("modulate_vibration stopped by user")
         finally:

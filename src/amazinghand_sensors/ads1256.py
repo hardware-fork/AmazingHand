@@ -220,11 +220,13 @@ class ADS1256:
             raise ValueError(f"ADS1256 single-ended channel must be 0–7, got {channel}")
         self._write_reg(REG["REG_MUX"], (channel << 4) | 0x08)
 
-    def _set_diff_channel(self, channel: int):
+    def _set_diff_channel(self, diff_channel: int):
+        # diff_channel is a pair index (0–3), not a physical pin number;
+        # pair 0 → AIN0/AIN1, pair 1 → AIN2/AIN3, etc.
         pairs = [(0, 1), (2, 3), (4, 5), (6, 7)]
-        if channel >= len(pairs):
-            raise ValueError(f"ADS1256 differential channel must be 0–3, got {channel}")
-        pos, neg = pairs[channel]
+        if diff_channel >= len(pairs):
+            raise ValueError(f"ADS1256 differential channel must be 0–3, got {diff_channel}")
+        pos, neg = pairs[diff_channel]
         self._write_reg(REG["REG_MUX"], (pos << 4) | neg)
 
     def _read_adc_data(self) -> int:
