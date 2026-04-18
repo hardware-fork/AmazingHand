@@ -24,16 +24,13 @@ from loguru import logger
 
 import amazinghand_sensors.ads1256 as _ads1256_mod
 from amazinghand_sensors.ads1256 import ADS1256
+from amazinghand_sensors._config import load_config
 
 # ---------------------------------------------------------------------------
 # Load shared settings from config.toml
 # ---------------------------------------------------------------------------
-import tomllib
 
-_CONFIG_PATH = Path(__file__).parent / "config.toml"
-with _CONFIG_PATH.open("rb") as _f:
-    _TOML = tomllib.load(_f)
-
+_TOML       = load_config()
 _SENSOR_CFG = _TOML["sensor"]
 _LOG_CFG    = _TOML["logging"]
 _VIZ_CFG    = _TOML["visualization"]
@@ -42,20 +39,24 @@ _VIZ_CFG    = _TOML["visualization"]
 # wherever the user invokes the script, not inside the installed package.
 _LOG_DIR = Path(_LOG_CFG["log_dir"])
 
+_MAX_CONSECUTIVE_POLL_ERRORS = 10
+
 
 # ---------------------------------------------------------------------------
-# loguru — file + stderr (set up once at import time)
+# loguru — configured lazily in _configure_logging() called from main()
 # ---------------------------------------------------------------------------
-_LOG_DIR.mkdir(parents=True, exist_ok=True)
-_log_file = _LOG_DIR / f"tactile_{datetime.now():%Y%m%d_%H%M%S}.log"
-logger.remove()
-logger.add(
-    sys.stderr, level="INFO", colorize=True,
-    format="<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | {message}",
-)
-logger.add(_log_file, level="DEBUG", rotation="10 MB",
-           format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {message}")
-logger.info("Log file: {}", _log_file)
+
+def _configure_logging() -> None:
+    _LOG_DIR.mkdir(parents=True, exist_ok=True)
+    log_file = _LOG_DIR / f"tactile_{datetime.now():%Y%m%d_%H%M%S}.log"
+    logger.remove()
+    logger.add(
+        sys.stderr, level="INFO", colorize=True,
+        format="<green>{time:HH:mm:ss}</green> | <level>{level: <8}</level> | {message}",
+    )
+    logger.add(log_file, level="DEBUG", rotation="10 MB",
+               format="{time:YYYY-MM-DD HH:mm:ss.SSS} | {level: <8} | {message}")
+    logger.info("Log file: {}", log_file)
 
 
 # ---------------------------------------------------------------------------
@@ -93,7 +94,7 @@ class TactileSensor:
 
     Parameters
     ----------
-    channels : list[int]
+    channels : list[int] | None
         ADC input channels (0–7).
     channel_names : list[str] | None
         Human-readable labels aligned with *channels*.
@@ -123,11 +124,11 @@ class TactileSensor:
 
     def __init__(
         self,
-        channels:      list[int]                                    = None,
-        channel_names: list[str]                                    = None,
-        gain_key:      str                                          = None,
-        drate_key:     str                                          = None,
-        ref_voltage:   float                                        = None,
+        channels:      list[int] | None                             = None,
+        channel_names: list[str] | None                             = None,
+        gain_key:      str | None                                   = None,
+        drate_key:     str | None                                   = None,
+        ref_voltage:   float | None                                 = None,
         fsr_vcc:       float                                        = _SENSOR_CFG["fsr_vcc"],
         fsr_r_fixed:   float                                        = _SENSOR_CFG["fsr_r_fixed"],
         polling_hz:    float                                        = _SENSOR_CFG["polling_hz"],
@@ -241,26 +242,31 @@ class TactileSensor:
         """FSR resistor-divider: Vout = Vcc * R_fixed / (R_fsr + R_fixed)."""
         if self._r_fixed <= 0 or v <= 0:
             return 0.0
-        try:
-            r_fsr = self._r_fixed * (self._vcc / v - 1.0)
-            if r_fsr <= 0:
-                return 1.0
-            return float(min(1.0, (1.0 / r_fsr) / (1.0 / self._r_fixed)))
-        except ZeroDivisionError:
+        r_fsr = self._r_fixed * (self._vcc / v - 1.0)
+        if r_fsr <= 0:
             return 1.0
+        return min(1.0, self._r_fixed / r_fsr)
 
     def _poll_loop(self) -> None:
         interval = 1.0 / self._polling_hz
+        consecutive_errors = 0
         while self._running:
             t0 = time.perf_counter()
             try:
                 reading = self._acquire()
                 with self._lock:
                     self._latest = reading
+                consecutive_errors = 0
                 if self._on_reading is not None:
                     self._on_reading(reading)
             except Exception as exc:
-                logger.error("Poll error: {}", exc)
+                consecutive_errors += 1
+                logger.error("Poll error ({}/{}): {}", consecutive_errors,
+                             _MAX_CONSECUTIVE_POLL_ERRORS, exc)
+                if consecutive_errors >= _MAX_CONSECUTIVE_POLL_ERRORS:
+                    logger.critical("Too many consecutive poll errors — stopping sensor")
+                    self._running = False
+                    break
             remaining = interval - (time.perf_counter() - t0)
             if remaining > 0:
                 time.sleep(remaining)
@@ -358,9 +364,12 @@ class TerminalDisplay:
 def _run_gui(sensor: TactileSensor, csv_logger: DataLogger | None,
              polling_hz: float) -> None:
     """Import PySide6 / pyqtgraph lazily so terminal mode works without them."""
+    import os
+    import signal
+
     try:
         from PySide6.QtCore import Qt, QTimer, Signal, QObject
-        from PySide6.QtGui import QColor, QFont
+        from PySide6.QtGui import QFont
         from PySide6.QtWidgets import (
             QApplication, QGridLayout, QHBoxLayout,
             QLabel, QMainWindow, QPushButton, QVBoxLayout, QWidget,
@@ -478,9 +487,12 @@ def _run_gui(sensor: TactileSensor, csv_logger: DataLogger | None,
 
             self.resize(900, max(400, len(names) // 2 * 160 + 60))
 
-            # Latest reading written by the sensor polling thread; read by the
-            # GUI refresh timer.  Single-object assignment is atomic under the
-            # GIL so no explicit lock is needed.
+            # _pending_reading is written by the sensor thread and read by the
+            # GUI refresh timer (main thread). A single object-reference swap is
+            # atomic under the GIL, so an explicit lock is deliberately omitted
+            # here to avoid blocking the sensor thread on every sample. This is
+            # intentionally different from _latest in TactileSensor, which uses
+            # a lock because it is also read from user code outside the GUI.
             self._pending_reading: TactileReading | None = None
 
             # CSV writes happen in the sensor polling thread (not the GUI
@@ -533,8 +545,6 @@ def _run_gui(sensor: TactileSensor, csv_logger: DataLogger | None,
             super().closeEvent(event)
             QApplication.instance().quit()
 
-    import os
-    import signal
     os.environ.setdefault("QT_QPA_PLATFORMTHEME", "")
     app = QApplication.instance() or QApplication(sys.argv)
     app.setStyle("Fusion")
@@ -596,6 +606,7 @@ def _parse_args() -> argparse.Namespace:
 
 
 def main() -> None:
+    _configure_logging()
     args = _parse_args()
 
     channel_names = args.names or _SENSOR_CFG["channel_names"]
@@ -623,9 +634,11 @@ def main() -> None:
         try:
             display.run()
         finally:
-            sensor.stop()
-            if csv_logger is not None:
-                csv_logger.close()
+            try:
+                sensor.stop()
+            finally:
+                if csv_logger is not None:
+                    csv_logger.close()
     else:
         _run_gui(sensor, csv_logger, args.hz)
 

@@ -17,18 +17,15 @@ from bokeh.models import TabPanel, Tabs
 from bokeh.palettes import Set2_8
 from bokeh.plotting import figure, show
 
+from amazinghand_sensors._config import load_config
+
 # ---------------------------------------------------------------------------
 # Load config.toml — same file used by tactile_sensing.py
 # ---------------------------------------------------------------------------
-import tomllib
-
-_CONFIG_PATH = Path(__file__).parent / "config.toml"
-with _CONFIG_PATH.open("rb") as _f:
-    _TOML = tomllib.load(_f)
 
 # Log dir is relative to the current working directory so it matches where
 # tactile_sensing.py writes CSV files.
-_LOG_DIR = Path(_TOML["logging"]["log_dir"])
+_LOG_DIR = Path(load_config()["logging"]["log_dir"])
 
 
 # ---------------------------------------------------------------------------
@@ -38,7 +35,9 @@ _LOG_DIR = Path(_TOML["logging"]["log_dir"])
 def _find_latest_csv(log_dir: Path) -> Path:
     csvs = sorted(log_dir.glob("tactile_*.csv"))
     if not csvs:
-        raise FileNotFoundError(f"No tactile_*.csv files found in {log_dir}")
+        raise FileNotFoundError(
+            f"No tactile_*.csv files found in {log_dir} — run tactile_sensing.py first"
+        )
     return csvs[-1]
 
 
@@ -55,7 +54,11 @@ def _customize_plot(fig) -> None:
 
 
 def build_tabs(data: pd.DataFrame) -> Tabs:
-    channels  = sorted(data["channel"].unique(), key=lambda x: (x.isdigit(), x))
+    # Sort purely numeric channel names numerically; fall back to alphabetical.
+    channels  = sorted(
+        data["channel"].unique(),
+        key=lambda x: (not x.isdigit(), int(x) if x.isdigit() else x),
+    )
     color_map = {ch: Set2_8[i % len(Set2_8)] for i, ch in enumerate(channels)}
 
     def _make_fig(title, y_label):
@@ -105,7 +108,13 @@ def main() -> None:
     file_path = args.file or _find_latest_csv(_LOG_DIR)
     print(f"Loading: {file_path}")
 
-    data = pd.read_csv(file_path).dropna().reset_index(drop=True)
+    raw_data = pd.read_csv(file_path)
+    original_len = len(raw_data)
+    data = raw_data.dropna().reset_index(drop=True)
+    dropped = original_len - len(data)
+    if dropped > 0:
+        print(f"Warning: dropped {dropped} rows with missing values")
+
     data["sensor_time"] = data["sensor_time"] - data["sensor_time"].iloc[0]
     data["channel"]     = data["channel"].astype(str)
 

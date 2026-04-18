@@ -8,7 +8,6 @@ Uses Ctrl-C to exit any continuous mode.
 """
 
 import argparse
-import sys
 from loguru import logger
 from .haptic_coin import HapticCoin
 
@@ -66,7 +65,7 @@ def main():
         elif choice == "q":
             haptic.cleanup()
             logger.info("Exiting")
-            sys.exit(0)
+            raise SystemExit(0)
 
         else:
             print("Unknown option — try again.")

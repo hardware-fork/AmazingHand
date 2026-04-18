@@ -78,4 +78,5 @@ class HapticCoin:
             return
         self.motor.off()
         self.motor.close()
+        self.motor = None   # guard against double-close
         logger.info("HapticCoin GPIO released")

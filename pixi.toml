@@ -24,6 +24,7 @@ CXX = "/usr/bin/g++"
 CARGO_TARGET_X86_64_UNKNOWN_LINUX_GNU_LINKER = "/usr/bin/gcc"
 
 [pypi-dependencies]
+amazinghand = { path = ".", editable = true }
 numpy = ">=1.20"
 rustypot = "*"
 pytest = "*"

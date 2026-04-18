@@ -5,19 +5,17 @@ Hardware pin and SPI settings are read from config.toml in the same directory.
 """
 
 import time
-from pathlib import Path
 
 import lgpio
 import spidev
 
+from amazinghand_sensors._config import load_config
+
 # ---------------------------------------------------------------------------
 # Load hardware settings from config.toml
 # ---------------------------------------------------------------------------
-import tomllib
 
-_CONFIG_PATH = Path(__file__).parent / "config.toml"
-with _CONFIG_PATH.open("rb") as _f:
-    _hw = tomllib.load(_f)["hardware"]
+_hw = load_config()["hardware"]
 
 _RST_PIN          : int = _hw["rst_pin"]
 _CS_PIN           : int = _hw["cs_pin"]
@@ -27,34 +25,11 @@ _SPI_MAX_SPEED_HZ : int = _hw["spi_max_speed_hz"]
 _SPI_MODE         : int = _hw["spi_mode"]
 
 # ---------------------------------------------------------------------------
-# Hardware handles
-# ---------------------------------------------------------------------------
-_SPI = spidev.SpiDev(0, 0)
-_h: int | None = None
-
-
-# ---------------------------------------------------------------------------
-# Low-level GPIO / SPI helpers
+# Hardware handles — initialised in _hw_init(), released in _hw_exit()
 # ---------------------------------------------------------------------------
 
-def _gpio_write(pin: int, value: int) -> None:
-    lgpio.gpio_write(_h, pin, value)
-
-
-def _gpio_read(pin: int) -> int:
-    return lgpio.gpio_read(_h, pin)
-
-
-def _delay_ms(ms: float) -> None:
-    time.sleep(ms / 1000.0)
-
-
-def _spi_write(data: list[int]) -> None:
-    _SPI.writebytes(data)
-
-
-def _spi_read(n: int) -> list[int]:
-    return _SPI.readbytes(n)
+_SPI: spidev.SpiDev | None = None
+_h:   int | None           = None
 
 
 # ---------------------------------------------------------------------------
@@ -62,19 +37,22 @@ def _spi_read(n: int) -> list[int]:
 # ---------------------------------------------------------------------------
 
 def _hw_init() -> None:
-    global _h
+    global _h, _SPI
+    _SPI = spidev.SpiDev(0, 0)
+    _SPI.max_speed_hz = _SPI_MAX_SPEED_HZ
+    _SPI.mode         = _SPI_MODE
     _h = lgpio.gpiochip_open(4)
     lgpio.gpio_claim_output(_h, _RST_PIN)
     lgpio.gpio_claim_output(_h, _CS_DAC_PIN)
     lgpio.gpio_claim_output(_h, _CS_PIN)
     lgpio.gpio_claim_input(_h, _DRDY_PIN)
-    _SPI.max_speed_hz = _SPI_MAX_SPEED_HZ
-    _SPI.mode         = _SPI_MODE
 
 
 def _hw_exit() -> None:
-    global _h
-    _SPI.close()
+    global _h, _SPI
+    if _SPI is not None:
+        _SPI.close()
+        _SPI = None
     if _h is not None:
         lgpio.gpiochip_close(_h)
         _h = None
@@ -144,8 +122,9 @@ CMD = {
     "CMD_RESET":    0xFE,
 }
 
-_STATUS_DRDY = 0x04
-ADC_MAX      = 0x7FFFFF   # 24-bit signed positive full-scale
+_STATUS_DRDY     = 0x04
+_EXPECTED_CHIP_ID = 3       # ADS1256 always reports chip ID 3 in STATUS[7:4]
+ADC_MAX          = 0x7FFFFF  # 24-bit signed positive full-scale
 
 # ADS1256 internal Vref = 2.5 V; with PGA=1 full-scale input = ±2×Vref = ±5 V
 REF_VOLTAGE = 2.5
@@ -165,43 +144,43 @@ class ADS1256:
 
     # --- SPI / GPIO primitives ---
 
-    def _write_cmd(self, cmd: int):
-        _gpio_write(self.cs_pin, 0)
-        _spi_write([cmd])
-        _gpio_write(self.cs_pin, 1)
+    def _write_cmd(self, cmd: int) -> None:
+        lgpio.gpio_write(_h, self.cs_pin, 0)
+        _SPI.writebytes([cmd])
+        lgpio.gpio_write(_h, self.cs_pin, 1)
 
-    def _write_reg(self, reg: int, data: int):
-        _gpio_write(self.cs_pin, 0)
-        _spi_write([CMD["CMD_WREG"] | reg, 0x00, data])
-        _gpio_write(self.cs_pin, 1)
+    def _write_reg(self, reg: int, data: int) -> None:
+        lgpio.gpio_write(_h, self.cs_pin, 0)
+        _SPI.writebytes([CMD["CMD_WREG"] | reg, 0x00, data])
+        lgpio.gpio_write(_h, self.cs_pin, 1)
 
     def _read_reg(self, reg: int) -> int:
-        _gpio_write(self.cs_pin, 0)
-        _spi_write([CMD["CMD_RREG"] | reg, 0x00])
-        data = _spi_read(1)
-        _gpio_write(self.cs_pin, 1)
+        lgpio.gpio_write(_h, self.cs_pin, 0)
+        _SPI.writebytes([CMD["CMD_RREG"] | reg, 0x00])
+        data = _SPI.readbytes(1)
+        lgpio.gpio_write(_h, self.cs_pin, 1)
         return data[0]
 
-    def _wait_drdy(self, timeout: int = 400_000):
+    def _wait_drdy(self, timeout: int = 400_000) -> None:
         for _ in range(timeout):
-            if _gpio_read(self.drdy_pin) == 0:
+            if lgpio.gpio_read(_h, self.drdy_pin) == 0:
                 return
         raise TimeoutError("ADS1256 DRDY timeout — check wiring / power")
 
     # --- Init helpers ---
 
-    def _reset(self):
-        _gpio_write(self.rst_pin, 1)
-        _delay_ms(200)
-        _gpio_write(self.rst_pin, 0)
-        _delay_ms(200)
-        _gpio_write(self.rst_pin, 1)
+    def _reset(self) -> None:
+        lgpio.gpio_write(_h, self.rst_pin, 1)
+        time.sleep(0.2)
+        lgpio.gpio_write(_h, self.rst_pin, 0)
+        time.sleep(0.2)
+        lgpio.gpio_write(_h, self.rst_pin, 1)
 
     def _read_chip_id(self) -> int:
         self._wait_drdy()
         return self._read_reg(REG["REG_STATUS"]) >> 4
 
-    def _config_adc(self, gain: int, drate: int):
+    def _config_adc(self, gain: int, drate: int) -> None:
         self._wait_drdy()
         buf = [
             (0 << 3) | _STATUS_DRDY | (0 << 1),  # STATUS
@@ -209,18 +188,18 @@ class ADS1256:
             (0 << 5) | (0 << 3) | gain,             # ADCON
             drate,                                  # DRATE
         ]
-        _gpio_write(self.cs_pin, 0)
-        _spi_write([CMD["CMD_WREG"] | 0, 0x03])
-        _spi_write(buf)
-        _gpio_write(self.cs_pin, 1)
-        _delay_ms(1)
+        lgpio.gpio_write(_h, self.cs_pin, 0)
+        _SPI.writebytes([CMD["CMD_WREG"] | 0, 0x03])
+        _SPI.writebytes(buf)
+        lgpio.gpio_write(_h, self.cs_pin, 1)
+        time.sleep(0.001)
 
-    def _set_channel(self, channel: int):
+    def _set_channel(self, channel: int) -> None:
         if channel > 7:
             raise ValueError(f"ADS1256 single-ended channel must be 0–7, got {channel}")
         self._write_reg(REG["REG_MUX"], (channel << 4) | 0x08)
 
-    def _set_diff_channel(self, diff_channel: int):
+    def _set_diff_channel(self, diff_channel: int) -> None:
         # diff_channel is a pair index (0–3), not a physical pin number;
         # pair 0 → AIN0/AIN1, pair 1 → AIN2/AIN3, etc.
         pairs = [(0, 1), (2, 3), (4, 5), (6, 7)]
@@ -231,10 +210,10 @@ class ADS1256:
 
     def _read_adc_data(self) -> int:
         self._wait_drdy()
-        _gpio_write(self.cs_pin, 0)
-        _spi_write([CMD["CMD_RDATA"]])
-        buf = _spi_read(3)
-        _gpio_write(self.cs_pin, 1)
+        lgpio.gpio_write(_h, self.cs_pin, 0)
+        _SPI.writebytes([CMD["CMD_RDATA"]])
+        buf = _SPI.readbytes(3)
+        lgpio.gpio_write(_h, self.cs_pin, 1)
         raw = ((buf[0] << 16) & 0xFF0000) | ((buf[1] << 8) & 0xFF00) | (buf[2] & 0xFF)
         if raw & 0x800000:          # two's-complement sign extension
             raw -= 0x1000000
@@ -247,8 +226,8 @@ class ADS1256:
         _hw_init()
         self._reset()
         chip_id = self._read_chip_id()
-        if chip_id != 3:
-            raise RuntimeError(f"ADS1256 chip ID mismatch: got {chip_id}, expected 3")
+        if chip_id != _EXPECTED_CHIP_ID:
+            raise RuntimeError(f"ADS1256 chip ID mismatch: got {chip_id}, expected {_EXPECTED_CHIP_ID}")
         self._config_adc(GAIN[gain_key], DRATE[drate_key])
 
     def get_channel_value(self, channel: int, diff: bool = False) -> int:
