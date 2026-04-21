@@ -22,6 +22,10 @@ GitHub Actions for lint (pre-commit), SDK, PythonExample, Demo, and AHControl te
 
 Pixi task `pixi run check-devices` lists webcam indices and serial ports. Use before running demos to verify device paths.
 
+## Tactile Sensing and Haptic Feedback
+
+FSR tactile sensing via the Waveshare ADS1256 24-bit ADC HAT, and PWM-driven haptic feedback via a QYF-740 coin motor. Includes real-time terminal/GUI display, CSV logging, and offline Bokeh visualisation. See [src/amazinghand_sensors/README.md](src/amazinghand_sensors/README.md).
+
 ## Other Changes
 
 Pixi for dependency management; unit tests for SDK, PythonExample, Demo, and AHControl; Dora/MuJoCo simulation demos; pre-commit hooks.
